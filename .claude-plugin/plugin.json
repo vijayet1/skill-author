@@ -1,0 +1,10 @@
+{
+  "name": "skill-author",
+  "description": "A meta-skill for creating, structuring, validating, and publishing AI agent skills. Compatible with Claude, OpenAI Agents, Copilot, and most AI harnesses.",
+  "version": "1.0.0",
+  "author": { "name": "vijayet1" },
+  "homepage": "https://github.com/vijayet1/skill-author#readme",
+  "repository": "https://github.com/vijayet1/skill-author",
+  "license": "MIT",
+  "keywords": ["skill", "ai", "agent", "claude", "skills"]
+}

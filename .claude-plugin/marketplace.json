@@ -1,0 +1,11 @@
+{
+  "name": "skill-author",
+  "owner": { "name": "vijayet1" },
+  "plugins": [
+    {
+      "name": "skill-author",
+      "source": "./",
+      "description": "Meta-skill for creating, structuring, validating, and publishing AI agent skills."
+    }
+  ]
+}
