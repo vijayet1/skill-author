@@ -1,0 +1,42 @@
+{
+  "name": "skill-author",
+  "version": "1.0.0",
+  "description": "A meta-skill for creating, structuring, and publishing AI agent skills. Compatible with Claude, OpenAI Agents, Copilot, and most AI harnesses.",
+  "keywords": ["skill", "ai", "agent", "claude", "openai", "copilot", "llm", "skills"],
+  "homepage": "https://github.com/vijayet1/skill-author#readme",
+  "bugs": {
+    "url": "https://github.com/vijayet1/skill-author/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vijayet1/skill-author.git"
+  },
+  "license": "MIT",
+  "author": "vijayet1",
+  "main": "index.js",
+  "bin": {
+    "skill-author": "./bin/install.js"
+  },
+  "files": [
+    "bin/",
+    "skills/",
+    "assets/",
+    "references/",
+    "scripts/",
+    "AGENTS.md",
+    "index.js"
+  ],
+  "scripts": {
+    "install-skill": "node bin/install.js",
+    "validate": "node scripts/validate.js",
+    "prepublishOnly": "npm run validate",
+    "test": "node scripts/validate.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}
