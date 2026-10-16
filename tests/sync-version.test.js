@@ -25,6 +25,15 @@ test('copies the package.json version into the Claude plugin manifest', () => {
   assert.deepEqual(plugin(root).author, { name: 'a' }); // other fields untouched
 });
 
+test('changes only the version string and preserves the file formatting', () => {
+  const root = fixture('2.0.0', '1.0.0');
+  const file = path.join(root, '.claude-plugin', 'plugin.json');
+  const original = '{\n  "name": "x",\n  "version": "1.0.0",\n  "author": { "name": "a" },\n  "keywords": ["a", "b"]\n}\n';
+  fs.writeFileSync(file, original);
+  sync(root);
+  assert.equal(fs.readFileSync(file, 'utf8'), original.replace('"1.0.0"', '"2.0.0"'));
+});
+
 test('is a no-op when versions already agree', () => {
   const root = fixture('1.0.0', '1.0.0');
   assert.deepEqual(sync(root), { changed: false, version: '1.0.0' });

@@ -10,10 +10,11 @@ function sync(root = path.join(__dirname, '..')) {
   const { version } = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
   const file = path.join(root, '.claude-plugin', 'plugin.json');
   if (!fs.existsSync(file)) return { changed: false, version };
-  const plugin = JSON.parse(fs.readFileSync(file, 'utf8'));
-  if (plugin.version === version) return { changed: false, version };
-  plugin.version = version;
-  fs.writeFileSync(file, `${JSON.stringify(plugin, null, 2)}\n`);
+  const text = fs.readFileSync(file, 'utf8');
+  if (JSON.parse(text).version === version) return { changed: false, version };
+  // Replace only the version string so the diff stays one line and the file's formatting is preserved.
+  const updated = text.replace(/("version"\s*:\s*")[^"]*(")/, `$1${version}$2`);
+  fs.writeFileSync(file, updated);
   return { changed: true, version };
 }
 
