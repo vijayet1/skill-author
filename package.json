@@ -1,7 +1,7 @@
 {
   "name": "skill-author",
   "version": "1.0.0",
-  "description": "A meta-skill for creating, structuring, and publishing AI agent skills. Compatible with Claude, OpenAI Agents, Copilot, and most AI harnesses.",
+  "description": "A meta-skill for creating, validating, and publishing Agent Skills that work across Claude Code, Codex, Pi, OpenCode, GitHub Copilot, and other harnesses.",
   "keywords": [
     "skill",
     "ai",
@@ -28,9 +28,8 @@
   },
   "files": [
     "bin/",
+    "lib/",
     "skills/",
-    "assets/",
-    "references/",
     "scripts/",
     "AGENTS.md",
     "index.js"
@@ -38,8 +37,8 @@
   "scripts": {
     "install-skill": "node bin/install.js",
     "validate": "node scripts/validate.js",
-    "prepublishOnly": "npm run validate",
-    "test": "node scripts/validate.js"
+    "test": "node --test",
+    "prepublishOnly": "npm run validate && npm test"
   },
   "engines": {
     "node": ">=18.0.0"
