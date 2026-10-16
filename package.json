@@ -10,7 +10,11 @@
     "openai",
     "copilot",
     "llm",
-    "skills"
+    "skills",
+    "pi-package",
+    "pi",
+    "opencode",
+    "agent-skills"
   ],
   "homepage": "https://github.com/vijayet1/skill-author#readme",
   "bugs": {
@@ -34,6 +38,11 @@
     "AGENTS.md",
     "index.js"
   ],
+  "pi": {
+    "skills": [
+      "./skills"
+    ]
+  },
   "scripts": {
     "install-skill": "node bin/install.js",
     "validate": "node scripts/validate.js",

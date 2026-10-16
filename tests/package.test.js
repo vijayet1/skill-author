@@ -113,3 +113,21 @@ test('CLI: installing the same skill twice for Pi prints the warning; --help lis
   assert.match(help, /opencode \(\.opencode\/skills/);
 });
 
+test('package.json is a Pi package: pi.skills points at the skills folder and the gallery keyword is set', () => {
+  const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
+  assert.deepEqual(pkg.pi, { skills: ['./skills'] });
+  assert.ok(pkg.keywords.includes('pi-package'));
+  for (const k of ['pi', 'opencode', 'agent-skills']) assert.ok(pkg.keywords.includes(k), k);
+  assert.ok(fs.existsSync(path.join(ROOT, 'skills', 'skill-author', 'SKILL.md')));
+  assert.equal(pkg.dependencies, undefined, 'zero runtime dependencies keeps pi install trivial');
+});
+
+test('package check catches a pi.skills path that does not exist', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'sa-pi-'));
+  fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify({ name: 'x', version: '1.0.0', pi: { skills: ['./skills', './missing/*'] } }));
+  fs.mkdirSync(path.join(root, 'skills'));
+  const msgs = validatePackage(root).map((p) => p.message).join(' | ');
+  assert.match(msgs, /pi\.skills entry "\.\/missing\/\*" does not exist/);
+  assert.doesNotMatch(msgs, /"\.\/skills"/);
+});
+
