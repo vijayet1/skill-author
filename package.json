@@ -38,6 +38,7 @@
     "install-skill": "node bin/install.js",
     "validate": "node scripts/validate.js",
     "test": "node --test",
+    "version": "node scripts/sync-version.js && git add .claude-plugin/plugin.json",
     "prepublishOnly": "npm run validate && npm test"
   },
   "engines": {
