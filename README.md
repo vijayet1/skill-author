@@ -24,25 +24,57 @@ npm install -g skill-author      # or run without installing: npx skill-author <
 
 ```bash
 skill-author                              # every project target
-skill-author install --target=agents      # one or more: claude, agents, copilot, generic
+skill-author install --target=agents      # one or more: claude, agents, copilot, generic, pi, opencode
 skill-author install --global             # into your home directory instead of the project
 skill-author install --dry-run            # show what would be written
 ```
 
 | Target | Project folder | User folder (`--global`) | Read by |
 |---|---|---|---|
-| `claude` | `.claude/skills/` | `~/.claude/skills/` | Claude Code |
-| `agents` | `.agents/skills/` | `~/.agents/skills/` | Codex, Pi, OpenCode, Amp, Cline, Gemini CLI and other Agent Skills hosts |
-| `copilot` | `.github/skills/` | `~/.copilot/skills/` | GitHub Copilot (also reads `.claude/skills`, `.agents/skills`) |
+| `agents` | `.agents/skills/` | `~/.agents/skills/` | **Pi, OpenCode 2**, Codex, Copilot, Amp, Cline, Gemini CLI and other Agent Skills hosts |
+| `claude` | `.claude/skills/` | `~/.claude/skills/` | Claude Code, OpenCode 2, GitHub Copilot |
+| `copilot` | `.github/skills/` | `~/.copilot/skills/` | GitHub Copilot |
 | `generic` | `skills/misc/` | none | your own tooling |
+| `pi` *(opt-in)* | `.pi/skills/` | `~/.pi/agent/skills/` | Pi only |
+| `opencode` *(opt-in)* | `.opencode/skills/` | `~/.config/opencode/skills/` | OpenCode 2 only |
+
+Plain `skill-author` installs the first four. `pi` and `opencode` are opt-in because `agents` already reaches both
+harnesses, and installing the same skill into two folders Pi reads makes Pi warn about duplicate skill names (the
+installer tells you when you ask for that).
 
 `openai` and `codex` still work as aliases for `agents`. Version 1.0 wrote them to `.codex/skills/`, which Codex does not
 read; it loads project skills from `.agents/skills`.
+
+### Pi and OpenCode 2
+
+Folder support below was measured on Pi 1.2.0 and OpenCode 2.0.30 with probe skills, not just read from docs.
+
+**Pi**
+```bash
+skill-author install --global --target=agents   # user-level: loads with no trust prompt
+pi install npm:skill-author                      # or as a Pi package (the npm package declares "pi": { "skills": [...] })
+pi -e npm:skill-author                           # try it for one run without changing settings
+```
+Project-level skills load only after Pi's project trust (accept the prompt or `pi --approve`). Use the skill with
+`/skill:skill-author <request>`; run `/reload` after editing.
+
+**OpenCode 2**
+```bash
+skill-author install --target=agents            # or --target=opencode for .opencode/skills only
+```
+Or reference the package without copying files, in `opencode.json`:
+`"skills": ["./node_modules/skill-author/skills"]`. Load it with `@skill-author` or let the model use the `skill` tool.
+
+Hiding a skill from automatic selection: in OpenCode use `metadata: { opencode/autoinvoke: "false" }` (spec-valid); the
+top-level `disable-model-invocation: true` that both Pi and OpenCode honour is not part of the spec, so validate
+such skills with `skill-author validate --allow-field=disable-model-invocation <dir>`. Details:
+[`references/harness-compat.md`](skills/skill-author/references/harness-compat.md).
 
 ### Validate any skill
 
 ```bash
 skill-author validate path/to/my-skill [more dirs...]
+skill-author validate --allow-field=disable-model-invocation path/to/skill   # accept a harness-specific field
 skill-author validate                      # this package's own skill and packaging
 ```
 

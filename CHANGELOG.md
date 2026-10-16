@@ -32,6 +32,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Test suite (`npm test`, `node:test`, 51 tests) run in CI on Node 18, 20, 22 and 24.
 - `scripts/sync-version.js` wired into `npm version` so `.claude-plugin/plugin.json` follows `package.json`.
 
+### Added (Pi and OpenCode 2)
+- Opt-in install targets `pi` (`.pi/skills`, `~/.pi/agent/skills`) and `opencode` (`.opencode/skills`,
+  `~/.config/opencode/skills`). Folder support was measured on Pi 1.2.0 and OpenCode 2.0.30 with probe skills: both
+  read the shared `.agents/skills`, which the default `agents` target already covers.
+- `skill-author install` warns when Pi would see the skill twice (Pi warns on duplicate names) and when a project-level
+  install needs Pi project trust (`pi --approve`).
+- The npm package is a Pi package: `pi` manifest (`skills: ["./skills"]`) and `pi-package`/`pi`/`opencode`/`agent-skills`
+  keywords, so `pi install npm:skill-author` works. Verified with a live Pi against the repo and the packed tarball.
+- Validator: namespaced `metadata` keys (OpenCode's `opencode/autoinvoke`) now parse and must be `true`/`false`;
+  `validate --allow-field=NAME` accepts harness fields the spec lacks, such as `disable-model-invocation`.
+  `validatePackage` checks `pi.skills` paths.
+- `references/harness-compat.md`: measured per-harness folders, trust, naming and invocation rules.
+
 ### Changed
 - `SKILL.md` restructured into the seven sections it teaches, with a corrected placement table.
 - `AGENTS.md` no longer says `SKILL.md` must be a single file with no supporting files, or that publishing needs an
