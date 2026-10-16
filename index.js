@@ -18,8 +18,8 @@ module.exports = {
   skillDir: SKILL_DIR,
   /** Copy the skill into harness folders. See lib/install.js for options; returns one result per target. */
   install,
-  /** Validate a skill directory (default: this package's own skill). Returns [{ level, message }]. */
-  validate: (dir = SKILL_DIR) => validateSkill(dir),
+  /** Validate a skill directory (default: this package's own skill). Options: { allowFields }. Returns [{ level, message }]. */
+  validate: (dir = SKILL_DIR, options) => validateSkill(dir || SKILL_DIR, options),
   validateSkill,
   validatePackage,
   hasErrors,

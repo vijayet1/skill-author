@@ -129,3 +129,22 @@ test('referenced files must exist and stay one level deep', () => {
   assert.deepEqual(validateSkill(ok), []);
   expectError({ body: SECTIONS + '\nSee `references/a/b.md`.\n', extra: { 'references/a/b.md': 'x' } }, 'one level deep');
 });
+
+test('harness-specific top-level fields are rejected unless explicitly allowed', () => {
+  const fm = GOOD_FM.replace('metadata:', 'disable-model-invocation: true\nmetadata:');
+  expectError({ fm }, 'Unexpected fields in frontmatter: disable-model-invocation');
+  const dir = make({ fm });
+  assert.deepEqual(validateSkill(dir, { allowFields: ['disable-model-invocation'] }), []);
+});
+
+test('an allowed boolean field must be true or false', () => {
+  const dir = make({ fm: GOOD_FM.replace('metadata:', 'disable-model-invocation: maybe\nmetadata:') });
+  const msgs = validateSkill(dir, { allowFields: ['disable-model-invocation'] }).map((p) => p.message);
+  assert.ok(msgs.some((m) => m.includes("disable-model-invocation must be 'true' or 'false'")), JSON.stringify(msgs));
+});
+
+test('OpenCode opencode/autoinvoke metadata is spec-valid and must be true or false', () => {
+  const ok = make({ fm: GOOD_FM.replace('  excludes: "x"', '  excludes: "x"\n  opencode/autoinvoke: "false"') });
+  assert.deepEqual(validateSkill(ok), []);
+  expectError({ fm: GOOD_FM.replace('  excludes: "x"', '  excludes: "x"\n  opencode/autoinvoke: "sometimes"') }, "metadata.opencode/autoinvoke must be 'true' or 'false'");
+});

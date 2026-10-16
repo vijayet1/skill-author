@@ -14,9 +14,11 @@ Usage:
       Targets: claude (.claude/skills), agents (.agents/skills: Codex, Pi, OpenCode, Amp, Cline, Gemini CLI, ...),
                copilot (.github/skills), generic (skills/misc). Legacy: openai, codex -> agents.
       --global installs under your home directory instead of the project (no generic target).
-  skill-author validate [SKILL_DIR ...]
+  skill-author validate [--allow-field=NAME[,NAME]] [SKILL_DIR ...]
       Check any skill against the Agent Skills spec and skill-author's authoring rules.
       With no argument, checks this package's own skill and packaging.
+      --allow-field accepts harness-specific top-level fields that the spec does not define, e.g.
+      disable-model-invocation (honoured by Pi and OpenCode; strict spec validators reject it).
   skill-author --version | --help
 
 Exit status: 0 ok, 1 errors or bad arguments.
@@ -43,6 +45,10 @@ function main(argv, io = { out: console.log, err: console.error }) {
 
   if (command === 'validate') {
     const dirs = args.filter((a) => !a.startsWith('-'));
+    const allowFields = args
+      .filter((a) => a.startsWith('--allow-field='))
+      .flatMap((a) => a.slice('--allow-field='.length).split(','))
+      .filter(Boolean);
     let failed = false;
     if (dirs.length === 0) {
       const root = path.join(__dirname, '..');
@@ -51,7 +57,7 @@ function main(argv, io = { out: console.log, err: console.error }) {
       failed = hasErrors(problems);
     }
     for (const d of dirs) {
-      const problems = validateSkill(d);
+      const problems = validateSkill(d, { allowFields });
       printProblems(d, problems, io);
       failed = failed || hasErrors(problems);
     }
