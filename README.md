@@ -125,7 +125,8 @@ git push --follow-tags
 ```
 
 Add the release notes to `CHANGELOG.md` before running `npm version`, then create a GitHub Release; the publish workflow
-publishes to npm with trusted publishing.
+stages the release on npm with trusted publishing (OIDC). Approve it with 2FA on npmjs.com (Staged Packages) or
+`npm stage approve <stage-id>` and it goes live.
 
 ## Contributing
 

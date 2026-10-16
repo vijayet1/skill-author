@@ -22,7 +22,7 @@ jobs:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Upgrade npm (required for trusted publishing)
+      - name: Upgrade npm (trusted publishing and staged publishing need a recent npm)
         run: npm install -g npm@latest
 
       - name: Install dependencies
@@ -34,5 +34,7 @@ jobs:
       - name: Validate skill and package
         run: npm run validate
 
-      - name: Publish with provenance
-        run: npm publish --access public
+      # Stages the release through OIDC (no stored token). It goes live only after a maintainer approves it with 2FA:
+      # npmjs.com -> package -> Staged Packages -> Approve, or `npm stage approve <stage-id>`.
+      - name: Stage publish with provenance
+        run: npm stage publish --access public

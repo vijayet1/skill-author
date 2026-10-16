@@ -73,5 +73,6 @@ npm version patch|minor|major       # bump, sync plugin.json, commit, tag
 - Do not embed secrets, tokens, or absolute paths in `SKILL.md`.
 - Do not make `lib/` functions print or exit.
 - Do not edit `.github/workflows/publish.yml` without understanding npm trusted publishing: it authenticates with OIDC
-  (`id-token: write`), there is no `NPM_TOKEN` secret.
+  (`id-token: write`), there is no `NPM_TOKEN` secret. It runs `npm stage publish`, so a release is staged and goes live only
+  after a maintainer approves it with 2FA (npmjs.com Staged Packages tab, or `npm stage approve <stage-id>`).
 - Do not publish or push tags without being asked.
