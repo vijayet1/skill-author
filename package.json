@@ -1,6 +1,6 @@
 {
   "name": "skill-author",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A meta-skill for creating, validating, and publishing Agent Skills that work across Claude Code, Codex, Pi, OpenCode, GitHub Copilot, and other harnesses.",
   "keywords": [
     "skill",

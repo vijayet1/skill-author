@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-16
+
 ### Fixed
 - The skill's frontmatter used top-level `triggers:` / `excludes:`, which the Agent Skills spec does not allow; the
   official `skills-ref` validator failed it with `Unexpected fields in frontmatter`. Both now live under `metadata`
@@ -29,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Validator rules: spec frontmatter fields and limits (mirroring `skills-ref`), the seven body sections,
   `metadata.triggers` (at least 3) and `metadata.excludes`, referenced files exist and are one level deep, version in
   `package.json` equals `.claude-plugin/plugin.json`, every `files[]` entry exists.
-- Test suite (`npm test`, `node:test`, 51 tests) run in CI on Node 18, 20, 22 and 24.
+- Test suite (`npm test`, `node:test`, 67 tests) run in CI on Node 18, 20, 22 and 24.
 - `scripts/sync-version.js` wired into `npm version` so `.claude-plugin/plugin.json` follows `package.json`.
 
 ### Added (Pi and OpenCode 2)
@@ -66,5 +68,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions workflows for validation and npm publishing with provenance
 - MIT license
 
-[Unreleased]: https://github.com/vijayet1/skill-author/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/vijayet1/skill-author/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/vijayet1/skill-author/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/vijayet1/skill-author/releases/tag/v1.0.0
