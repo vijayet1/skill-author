@@ -101,3 +101,15 @@ test('the programmatic validate() forwards options', () => {
   assert.deepEqual(api.validate(undefined, { allowFields: ['disable-model-invocation'] }), []);
 });
 
+test('CLI: installing the same skill twice for Pi prints the warning; --help lists the new targets', () => {
+  const r = run('install', '--target=pi,agents', '--dry-run');
+  assert.equal(r.status, 0);
+  assert.match(r.stdout, /note: Pi reads both agents and pi/);
+  const g = run('install', '--target=pi', '--global', '--dry-run');
+  assert.doesNotMatch(g.stdout, /project trust/);
+  assert.match(g.stdout, /\.pi\/agent\/skills/);
+  const help = run('--help').stdout;
+  assert.match(help, /pi \(\.pi\/skills/);
+  assert.match(help, /opencode \(\.opencode\/skills/);
+});
+

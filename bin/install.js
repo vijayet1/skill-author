@@ -3,7 +3,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { install } = require('../lib/install');
+const { install, harnessNotes } = require('../lib/install');
 const { validateSkill, validatePackage, hasErrors } = require('../lib/validate');
 
 const HELP = `skill-author - create, validate and install AI agent skills
@@ -11,8 +11,11 @@ const HELP = `skill-author - create, validate and install AI agent skills
 Usage:
   skill-author [install] [--target=NAME[,NAME]] [--global] [--dry-run]
       Copy the skill-author skill into your harnesses' skill folders (default: every project target).
-      Targets: claude (.claude/skills), agents (.agents/skills: Codex, Pi, OpenCode, Amp, Cline, Gemini CLI, ...),
-               copilot (.github/skills), generic (skills/misc). Legacy: openai, codex -> agents.
+      Targets: claude (.claude/skills), agents (.agents/skills: Pi, OpenCode, Codex, Amp, Cline, Gemini CLI, ...),
+               copilot (.github/skills), generic (skills/misc)   <- the default set
+               pi (.pi/skills), opencode (.opencode/skills)       <- opt-in native folders
+      Pi and OpenCode both read the shared agents folder, so that alone covers them; add pi or opencode only
+      for a native-only install. Legacy: openai, codex -> agents.
       --global installs under your home directory instead of the project (no generic target).
   skill-author validate [--allow-field=NAME[,NAME]] [SKILL_DIR ...]
       Check any skill against the Agent Skills spec and skill-author's authoring rules.
@@ -78,6 +81,8 @@ function main(argv, io = { out: console.log, err: console.error }) {
     for (const r of results) {
       io.out(`  [${r.status}] ${r.target}${r.dir ? ` -> ${r.dir}` : ''}${r.note ? `  (${r.note})` : ''}`);
     }
+    const notes = harnessNotes({ targets: results.map((r) => r.target), global: args.includes('--global') });
+    for (const n of notes) io.out(`\n  note: ${n}`);
     io.out('\nDone. Reload your AI harness to pick up the new skill.');
     return 0;
   }
