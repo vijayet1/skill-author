@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { install, resolveTargets, TARGETS } = require('../lib/install');
+const { install, resolveTargets, findOverlaps, harnessNotes, TARGETS } = require('../lib/install');
 
 const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'skill-author-install-'));
 const SRC = path.join(__dirname, '..', 'skills', 'skill-author');
@@ -85,3 +85,53 @@ test('accepts several targets', () => {
   const results = install({ cwd, home: tmp(), target: ['claude', 'copilot'] });
   assert.deepEqual(results.map((r) => r.target), ['claude', 'copilot']);
 });
+
+test('native Pi and OpenCode targets use the folders those harnesses read (measured, not assumed)', () => {
+  assert.deepEqual(TARGETS.pi.project, ['.pi', 'skills']);
+  assert.deepEqual(TARGETS.pi.user, ['.pi', 'agent', 'skills']);
+  assert.deepEqual(TARGETS.opencode.project, ['.opencode', 'skills']);
+  assert.deepEqual(TARGETS.opencode.user, ['.config', 'opencode', 'skills']);
+});
+
+test('installs to Pi and OpenCode native folders, project and global', () => {
+  const cwd = tmp();
+  install({ cwd, home: tmp(), target: ['pi', 'opencode'] });
+  for (const rel of ['.pi/skills', '.opencode/skills']) assert.ok(fs.existsSync(path.join(cwd, rel, 'skill-author', 'SKILL.md')), rel);
+  const home = tmp();
+  install({ cwd: tmp(), home, global: true, target: ['pi', 'opencode'] });
+  assert.ok(fs.existsSync(path.join(home, '.pi/agent/skills/skill-author/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(home, '.config/opencode/skills/skill-author/SKILL.md')));
+});
+
+test('the default targets are unchanged: Pi and OpenCode are reached through `agents`, native ones are opt-in', () => {
+  assert.deepEqual(resolveTargets().map((t) => t.target), ['claude', 'agents', 'copilot', 'generic']);
+  assert.ok(TARGETS.agents.reads.includes('Pi') && TARGETS.agents.reads.includes('OpenCode'));
+});
+
+test('every target declares which harnesses read it', () => {
+  for (const [name, def] of Object.entries(TARGETS)) assert.ok(Array.isArray(def.reads), name);
+  assert.deepEqual(TARGETS.generic.reads, []);
+});
+
+test('findOverlaps reports harnesses that would see the same skill twice', () => {
+  assert.deepEqual(findOverlaps(['agents', 'pi']), [{ harness: 'Pi', targets: ['agents', 'pi'] }]);
+  assert.deepEqual(findOverlaps(['pi', 'agents']), [{ harness: 'Pi', targets: ['agents', 'pi'] }]); // typing order is irrelevant
+  assert.deepEqual(findOverlaps(['pi', 'opencode']), []);
+  const h = findOverlaps(['claude', 'agents']).map((o) => o.harness);
+  assert.ok(h.includes('OpenCode') && h.includes('GitHub Copilot'));
+});
+
+test('notes warn about the Pi duplicate-name warning and the project-trust requirement', () => {
+  const dup = harnessNotes({ targets: ['agents', 'pi'], global: false }).join('\n');
+  assert.match(dup, /Pi reads both agents and pi and warns about duplicate skill names/);
+  assert.match(dup, /project trust/);
+  const globalNotes = harnessNotes({ targets: ['agents'], global: true }).join('\n');
+  assert.doesNotMatch(globalNotes, /project trust/);
+  assert.deepEqual(harnessNotes({ targets: ['opencode'], global: false }), []);
+});
+
+test('the default install triggers no Pi duplicate warning (Pi only reads the agents folder)', () => {
+  const notes = harnessNotes({ targets: resolveTargets().map((t) => t.target), global: false }).join('\n');
+  assert.doesNotMatch(notes, /duplicate skill names/);
+});
+

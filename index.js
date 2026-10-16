@@ -1,7 +1,7 @@
 'use strict';
 
 const path = require('node:path');
-const { install, TARGETS } = require('./lib/install');
+const { install, findOverlaps, harnessNotes, TARGETS } = require('./lib/install');
 const { validateSkill, validatePackage, hasErrors } = require('./lib/validate');
 const { parseFrontmatter } = require('./lib/frontmatter');
 
@@ -25,4 +25,6 @@ module.exports = {
   hasErrors,
   parseFrontmatter,
   targets: TARGETS,
+  findOverlaps,
+  harnessNotes,
 };
