@@ -7,7 +7,8 @@ Thank you for your interest in contributing.
 ```bash
 git clone https://github.com/vijayet1/skill-author.git
 cd skill-author
-node scripts/validate.js
+npm test              # tests (Node 18+, no install step: there are no dependencies)
+npm run validate      # validate the skill and the packaging
 ```
 
 ## How to Contribute
@@ -23,14 +24,15 @@ Open an issue with the `enhancement` label. Describe what the current behavior i
 1. Fork the repository.
 2. Create a branch: `git checkout -b feat/your-feature`
 3. Make your changes.
-4. Run `node scripts/validate.js` and ensure zero errors.
+4. Run `npm test` and `npm run validate` and ensure zero errors. Add tests for new behavior.
 5. Update `CHANGELOG.md` under `[Unreleased]`.
 6. Open a pull request against `main`.
 
 ## Coding Standards
 
 - Node.js 18+ only, no external runtime dependencies.
-- All skill changes must keep `SKILL.md` under 500 lines.
+- All skill changes must keep `SKILL.md` under 500 lines and use only spec frontmatter fields (see `skills/skill-author/references/frontmatter-spec.md`).
+- Code in `lib/` returns data and never prints or exits; the CLI in `bin/` does the printing.
 - Never embed secrets, absolute paths, or harness-specific tokens in `SKILL.md`.
 - Keep scripts deterministic — same input must produce same output.
 

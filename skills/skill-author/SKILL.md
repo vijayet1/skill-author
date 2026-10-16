@@ -65,12 +65,12 @@ Codex reads `.agents/skills`, not `.codex/skills`. `npx skill-author install --t
 
 ### Publishing
 
-1. Run `npm test`: it validates the package and runs the tests.
-2. Bump the version in `package.json` and `.claude-plugin/plugin.json` together; the validator fails if they differ.
-3. Add the release notes to `CHANGELOG.md`.
-4. Commit, then tag `vX.Y.Z` and push the tag.
+1. Run `npm test`: it runs the tests and validates the package.
+2. Add the release notes to `CHANGELOG.md`.
+3. Run `npm version patch|minor|major`: it bumps `package.json`, syncs `.claude-plugin/plugin.json` through the `version` script, commits and tags `vX.Y.Z`.
+4. Push the commit and tag (`git push --follow-tags`).
 5. Create a GitHub Release; the publish workflow publishes to npm with trusted publishing.
-6. Confirm the new version on npmjs.com. The `files` list in `package.json` must name only paths that exist.
+6. Confirm the new version on npmjs.com. Every path in the `files` list of `package.json` must exist.
 
 ## 6. Examples
 
