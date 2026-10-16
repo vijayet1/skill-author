@@ -36,7 +36,7 @@ You create, review and publish Agent Skills: folders whose `SKILL.md` tells an a
 6. Move long material to `references/`, templates to `assets/` and deterministic helper code to `scripts/`. Link each file with a relative path, one level deep. Keep `SKILL.md` under 500 lines.
 7. Validate: run `npx skill-author validate <skill-dir>`. Fix every error and read every warning. When available, also run the official validator: `skills-ref validate <skill-dir>`.
 8. Test routing with two prompts: one that should select the skill and one that should not. Adjust the description until both behave.
-9. Place the skill for each harness with `npx skill-author install` (see the placement table), or publish it (see the publishing steps).
+9. Place the skill for each harness with `npx skill-author install` (see the placement table), or publish it (see the publishing steps). Check how Pi and OpenCode 2 discover and name it in `references/harness-compat.md`.
 
 ## 5. Domain Conventions
 
@@ -57,11 +57,13 @@ You create, review and publish Agent Skills: folders whose `SKILL.md` tells an a
 
 | Harness | Project folder | User folder |
 |---|---|---|
-| Claude Code | `.claude/skills/<name>/` | `~/.claude/skills/<name>/` |
-| Agent Skills standard (Codex, Pi, OpenCode, Amp, Cline, Gemini CLI and others) | `.agents/skills/<name>/` | `~/.agents/skills/<name>/` |
-| GitHub Copilot | `.github/skills/<name>/` (also reads `.claude/skills` and `.agents/skills`) | `~/.copilot/skills/<name>/` or `~/.agents/skills/<name>/` |
+| Agent Skills standard: Pi, OpenCode 2, Codex, Amp, Cline, Gemini CLI and others | `.agents/skills/<name>/` | `~/.agents/skills/<name>/` |
+| Claude Code (OpenCode 2 and Copilot also read it) | `.claude/skills/<name>/` | `~/.claude/skills/<name>/` |
+| GitHub Copilot | `.github/skills/<name>/` (also reads `.claude/skills`, `.agents/skills`) | `~/.copilot/skills/<name>/` or `~/.agents/skills/<name>/` |
+| Pi, native | `.pi/skills/<name>/` | `~/.pi/agent/skills/<name>/` |
+| OpenCode 2, native | `.opencode/skills/<name>/` | `~/.config/opencode/skills/<name>/` |
 
-Codex reads `.agents/skills`, not `.codex/skills`. `npx skill-author install --target=agents` writes the shared location; add `--global` for the user folder.
+`.agents/skills` alone reaches Pi, OpenCode 2 and Codex, so prefer it; Codex does not read `.codex/skills`. Pi warns when it finds the same skill name in two folders it reads, and loads project-level skills only after project trust (`pi --approve`), so for Pi prefer `--global`. `npx skill-author install` writes these folders (`--target=agents|claude|copilot|pi|opencode|generic`, `--global`, `--dry-run`). Measured folder-by-folder results, invocation, hiding a skill from automatic selection, and Pi or OpenCode distribution are in `references/harness-compat.md`.
 
 ### Publishing
 

@@ -83,3 +83,51 @@ test('CLI: no subcommand still installs (backwards compatible)', () => {
   assert.equal(r.status, 0);
   assert.match(r.stdout, /agents/);
 });
+
+test('CLI: validate --allow-field accepts Pi/OpenCode harness fields only when asked', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'sa-allow-'));
+  const dir = path.join(root, 'hidden-skill');
+  fs.mkdirSync(dir);
+  fs.copyFileSync(path.join(ROOT, 'skills', 'skill-author', 'assets', 'SKILL.template.md'), path.join(dir, 'SKILL.md'));
+  const md = path.join(dir, 'SKILL.md');
+  fs.writeFileSync(md, fs.readFileSync(md, 'utf8').replace('name: skill-name', 'name: hidden-skill').replace('metadata:', 'disable-model-invocation: true\nmetadata:'));
+  assert.equal(run('validate', dir).status, 1);
+  const ok = run('validate', '--allow-field=disable-model-invocation', dir);
+  assert.equal(ok.status, 0, ok.stdout + ok.stderr);
+  assert.equal(run('validate', '--allow-field=disable-model-invocation,other-field', dir).status, 0);
+});
+
+test('the programmatic validate() forwards options', () => {
+  assert.deepEqual(api.validate(undefined, { allowFields: ['disable-model-invocation'] }), []);
+});
+
+test('CLI: installing the same skill twice for Pi prints the warning; --help lists the new targets', () => {
+  const r = run('install', '--target=pi,agents', '--dry-run');
+  assert.equal(r.status, 0);
+  assert.match(r.stdout, /note: Pi reads both agents and pi/);
+  const g = run('install', '--target=pi', '--global', '--dry-run');
+  assert.doesNotMatch(g.stdout, /project trust/);
+  assert.match(g.stdout, /\.pi\/agent\/skills/);
+  const help = run('--help').stdout;
+  assert.match(help, /pi \(\.pi\/skills/);
+  assert.match(help, /opencode \(\.opencode\/skills/);
+});
+
+test('package.json is a Pi package: pi.skills points at the skills folder and the gallery keyword is set', () => {
+  const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
+  assert.deepEqual(pkg.pi, { skills: ['./skills'] });
+  assert.ok(pkg.keywords.includes('pi-package'));
+  for (const k of ['pi', 'opencode', 'agent-skills']) assert.ok(pkg.keywords.includes(k), k);
+  assert.ok(fs.existsSync(path.join(ROOT, 'skills', 'skill-author', 'SKILL.md')));
+  assert.equal(pkg.dependencies, undefined, 'zero runtime dependencies keeps pi install trivial');
+});
+
+test('package check catches a pi.skills path that does not exist', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'sa-pi-'));
+  fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify({ name: 'x', version: '1.0.0', pi: { skills: ['./skills', './missing/*'] } }));
+  fs.mkdirSync(path.join(root, 'skills'));
+  const msgs = validatePackage(root).map((p) => p.message).join(' | ');
+  assert.match(msgs, /pi\.skills entry "\.\/missing\/\*" does not exist/);
+  assert.doesNotMatch(msgs, /"\.\/skills"/);
+});
+

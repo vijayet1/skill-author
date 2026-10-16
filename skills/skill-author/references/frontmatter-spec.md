@@ -49,3 +49,18 @@ Front-load the main use case and its trigger words: hosts such as Codex shorten 
 Hosts load only `name` and `description` at startup, the full `SKILL.md` when the skill is chosen, and `references/`,
 `assets/` and `scripts/` files on demand. Keep `SKILL.md` under 500 lines (about 5000 tokens) and link supporting files
 one level deep from the skill root.
+
+## Harness-specific optional fields
+
+Some harnesses honour fields the specification does not define. Strict validators (including `skills-ref`) reject
+unknown top-level fields, so prefer `metadata` when the harness allows it:
+
+| Goal | Where | Harness |
+|---|---|---|
+| Hide from automatic selection | `metadata: { opencode/autoinvoke: "false" }` (spec-valid) | OpenCode 2 |
+| Hide from automatic selection | top-level `disable-model-invocation: true` (not in the spec) | Pi, OpenCode 2 |
+
+`skill-author validate` accepts namespaced `metadata` keys such as `opencode/autoinvoke` and checks they are
+`"true"` or `"false"`. For the top-level form, opt in explicitly:
+`skill-author validate --allow-field=disable-model-invocation <dir>`. See `harness-compat.md` for the rest.
+

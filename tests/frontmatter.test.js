@@ -19,6 +19,11 @@ test('accepts YAML lists so legacy triggers/excludes can be reported by the vali
   assert.deepEqual(data.triggers, ['one', 'two']);
 });
 
+test('accepts namespaced metadata keys such as OpenCode\'s opencode/autoinvoke', () => {
+  const { data } = parseFrontmatter('---\nname: x\nmetadata:\n  opencode/autoinvoke: "false"\n  my.org/flag: yes\n---\n');
+  assert.deepEqual(data.metadata, { 'opencode/autoinvoke': 'false', 'my.org/flag': 'yes' });
+});
+
 test('ignores blank lines and comments', () => {
   const { data } = parseFrontmatter('---\n# comment\nname: x\n\ndescription: y\n---\n');
   assert.deepEqual(data, { name: 'x', description: 'y' });
