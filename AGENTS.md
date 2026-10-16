@@ -22,7 +22,7 @@ skill-author/
   scripts/sync-version.js      # npm `version` hook: copies the version into .claude-plugin/plugin.json
   skills/skill-author/
     SKILL.md                   # canonical skill, the primary deliverable
-    references/                # frontmatter-spec.md, examples.md (loaded on demand)
+    references/                # frontmatter-spec.md, examples.md, harness-compat.md (loaded on demand)
     assets/SKILL.template.md   # starter template (validated by a test)
   tests/                       # node:test suites, run with `npm test`
   .claude-plugin/              # Claude Code plugin + marketplace manifests
@@ -41,7 +41,7 @@ skill-author/
 - Library code in `lib/` and `index.js` never prints or calls `process.exit`; only `bin/` and `scripts/` do.
 - `package.json` and `.claude-plugin/plugin.json` carry the same version (`npm version` syncs them; the validator
   fails on a mismatch). Every release updates `CHANGELOG.md`.
-- Every path in `package.json` `files` exists (checked by `validatePackage`).
+- Every path in `package.json` `files` and `pi.skills` exists (checked by `validatePackage`). The package is also a Pi package (`pi` manifest, `pi-package` keyword): keep skills under `skills/` and runtime dependencies at zero.
 
 ## Placement Targets
 
@@ -50,9 +50,11 @@ skill-author/
 | claude | `.claude/skills/skill-author/` | `~/.claude/skills/skill-author/` |
 | agents (Codex, Pi, OpenCode, Amp, Cline, Gemini CLI...) | `.agents/skills/skill-author/` | `~/.agents/skills/skill-author/` |
 | copilot | `.github/skills/skill-author/` | `~/.copilot/skills/skill-author/` |
+| pi (opt-in) | `.pi/skills/skill-author/` | `~/.pi/agent/skills/skill-author/` |
+| opencode (opt-in) | `.opencode/skills/skill-author/` | `~/.config/opencode/skills/skill-author/` |
 | generic | `skills/misc/skill-author/` | none |
 
-Codex reads `.agents/skills`, not `.codex/skills`.
+Codex reads `.agents/skills`, not `.codex/skills`. Pi and OpenCode 2 both read `.agents/skills`, so `agents` is the recommended target for them; `pi` and `opencode` are opt-in and kept out of the default set because Pi warns on duplicate skill names. Each target's `reads` list in `lib/install.js` must stay true: re-measure with probe skills before changing it.
 
 ## Commands
 
