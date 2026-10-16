@@ -6,23 +6,34 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   validate:
-    name: Validate skill
+    name: Validate and test (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['18', '20', '22', '24']
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
+      # No `cache: npm`: the package has zero dependencies and therefore no lockfile,
+      # and setup-node fails when a cache is requested without one.
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: ${{ matrix.node }}
 
-      - name: Validate skill
-        run: node scripts/validate.js
+      - name: Tests
+        run: npm test
+
+      - name: Validate skill and package
+        run: npm run validate
 
       - name: Dry-run npm pack
         run: npm pack --dry-run
