@@ -83,3 +83,21 @@ test('CLI: no subcommand still installs (backwards compatible)', () => {
   assert.equal(r.status, 0);
   assert.match(r.stdout, /agents/);
 });
+
+test('CLI: validate --allow-field accepts Pi/OpenCode harness fields only when asked', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'sa-allow-'));
+  const dir = path.join(root, 'hidden-skill');
+  fs.mkdirSync(dir);
+  fs.copyFileSync(path.join(ROOT, 'skills', 'skill-author', 'assets', 'SKILL.template.md'), path.join(dir, 'SKILL.md'));
+  const md = path.join(dir, 'SKILL.md');
+  fs.writeFileSync(md, fs.readFileSync(md, 'utf8').replace('name: skill-name', 'name: hidden-skill').replace('metadata:', 'disable-model-invocation: true\nmetadata:'));
+  assert.equal(run('validate', dir).status, 1);
+  const ok = run('validate', '--allow-field=disable-model-invocation', dir);
+  assert.equal(ok.status, 0, ok.stdout + ok.stderr);
+  assert.equal(run('validate', '--allow-field=disable-model-invocation,other-field', dir).status, 0);
+});
+
+test('the programmatic validate() forwards options', () => {
+  assert.deepEqual(api.validate(undefined, { allowFields: ['disable-model-invocation'] }), []);
+});
+
